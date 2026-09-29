@@ -1,14 +1,14 @@
-variable "db_username" {
-  type        = string
-  description = "Database username for Dev environment"
-  default     = "dev_user"
-}
+# variable "db_username" {
+#   type        = string
+#   description = "Database username for Dev environment"
+#   default     = "dev_user"
+# }
 
-variable "db_password" {
-  type        = string
-  description = "Database password for Dev environment"
-  sensitive   = true
-}
+# variable "db_password" {
+#   type        = string
+#   description = "Database password for Dev environment"
+#   sensitive   = true
+# }
 
 
 # Standard string variable output
