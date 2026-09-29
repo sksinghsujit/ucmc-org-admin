@@ -1,2 +1,0 @@
-# ucmc-org-admin
-test
