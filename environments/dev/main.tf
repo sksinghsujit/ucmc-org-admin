@@ -16,6 +16,9 @@ output "debug_db_password" {
   sensitive = true
 }
 
+
+variable "VAULT_ADDR" {}
+variable "VAULT_TOKEN" {}
 variable "KUBE_HOST" {}
 variable "KUBE_TOKEN" {}
 variable "KUBE_CLUSTER_CA_CERT_DATA" {}
