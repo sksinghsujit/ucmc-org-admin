@@ -71,6 +71,8 @@ resource "vault_kv_secret_v2" "dev_db_secret" {
     username = var.db_username
     password = var.db_password
   })
-}# Comment
+}
+
+# Comment
 # Comment
 # Comment
