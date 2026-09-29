@@ -4,7 +4,6 @@ variable "db_username" {
 
 variable "db_password" {
   type      = string
-  sensitive = false
 }
 
 output "debug_db_username" {
