@@ -1,25 +1,14 @@
 variable "db_username" {
-  type        = string
-  description = "Database username for Dev environment"
-  default     = "dev_user"
+  type = string
 }
 
 variable "db_password" {
-  type        = string
-  description = "Database password for Dev environment"
-  sensitive   = true
+  type      = string
+  sensitive = true
 }
 
-
-# Standard string variable output
 output "debug_db_username" {
   value = var.db_username
-}
-
-# Sensitive variable output
-output "debug_db_password" {
-  value     = var.db_password
-  sensitive = true
 }
 
 # terraform {
