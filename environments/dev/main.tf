@@ -10,58 +10,70 @@ variable "db_password" {
   sensitive   = true
 }
 
-terraform {
-  required_version = ">= 1.5.0"
-  required_providers {
-    vault = {
-      source  = "hashicorp/vault"
-      version = "~> 4.0"
-    }
-  }
+
+# Standard string variable output
+output "debug_db_username" {
+  value = var.db_username
 }
 
-provider "vault" {
-  address = "http://vault1.ucmcswg.com:8200"
+# Sensitive variable output
+output "debug_db_password" {
+  value     = var.db_password
+  sensitive = true
 }
 
-data "vault_auth_backend" "kubernetes" {
-  path = "kubernetes"
-}
+# terraform {
+#   required_version = ">= 1.5.0"
+#   required_providers {
+#     vault = {
+#       source  = "hashicorp/vault"
+#       version = "~> 4.0"
+#     }
+#   }
+# }
 
-data "vault_mount" "kvv2" {
-  path = "secret"
-}
+# provider "vault" {
+#   address = "http://vault1.ucmcswg.com:8200"
+# }
 
-# Dev Policy
-resource "vault_policy" "dev_policy" {
-  name = "dev-app-policy"
+# data "vault_auth_backend" "kubernetes" {
+#   path = "kubernetes"
+# }
 
-  policy = <<EOT
-path "${data.vault_mount.kvv2.path}/data/dev/*" {
-  capabilities = ["read", "list"]
-}
-EOT
-}
+# data "vault_mount" "kvv2" {
+#   path = "secret"
+# }
 
-# Dev Kubernetes Auth Role
-resource "vault_kubernetes_auth_backend_role" "dev_role" {
-  backend                          = data.vault_auth_backend.kubernetes.path
-  role_name                        = "dev-app-role"
-  bound_service_account_names      = ["default", "my-app-sa"]
-  bound_service_account_namespaces = ["app-dev"]
-  token_policies                   = [vault_policy.dev_policy.name]
-  token_ttl                        = 3600
-}
+# # Dev Policy
+# resource "vault_policy" "dev_policy" {
+#   name = "dev-app-policy"
 
-# Dev Secret in Vault (Populated via HCP Terraform Variables)
-resource "vault_kv_secret_v2" "dev_db_secret" {
-  mount               = data.vault_mount.kvv2.path
-  name                = "dev/database"
-  cas                 = 1
-  delete_all_versions = true
+#   policy = <<EOT
+# path "${data.vault_mount.kvv2.path}/data/dev/*" {
+#   capabilities = ["read", "list"]
+# }
+# EOT
+# }
 
-  data_json = jsonencode({
-    username = var.db_username
-    password = var.db_password
-  })
-}
+# # Dev Kubernetes Auth Role
+# resource "vault_kubernetes_auth_backend_role" "dev_role" {
+#   backend                          = data.vault_auth_backend.kubernetes.path
+#   role_name                        = "dev-app-role"
+#   bound_service_account_names      = ["default", "my-app-sa"]
+#   bound_service_account_namespaces = ["app-dev"]
+#   token_policies                   = [vault_policy.dev_policy.name]
+#   token_ttl                        = 3600
+# }
+
+# # Dev Secret in Vault (Populated via HCP Terraform Variables)
+# resource "vault_kv_secret_v2" "dev_db_secret" {
+#   mount               = data.vault_mount.kvv2.path
+#   name                = "dev/database"
+#   cas                 = 1
+#   delete_all_versions = true
+
+#   data_json = jsonencode({
+#     username = var.db_username
+#     password = var.db_password
+#   })
+# }
