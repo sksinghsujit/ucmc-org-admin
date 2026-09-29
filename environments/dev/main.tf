@@ -4,11 +4,11 @@ variable "db_username" {
   default     = "dev_user"
 }
 
-# variable "db_password" {
-#   type        = string
-#   description = "Database password for Dev environment"
-#   sensitive   = true
-# }
+variable "db_password" {
+  type        = string
+  description = "Database password for Dev environment"
+  sensitive   = true
+}
 
 
 # Standard string variable output
@@ -16,11 +16,11 @@ output "debug_db_username" {
   value = var.db_username
 }
 
-# # Sensitive variable output
-# output "debug_db_password" {
-#   value     = var.db_password
-#   sensitive = true
-# }
+# Sensitive variable output
+output "debug_db_password" {
+  value     = var.db_password
+  sensitive = true
+}
 
 # terraform {
 #   required_version = ">= 1.5.0"
