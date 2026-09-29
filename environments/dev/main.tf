@@ -16,7 +16,9 @@ output "debug_db_password" {
   sensitive = true
 }
 
-
+variable "KUBE_HOST" {}
+variable "KUBE_TOKEN" {}
+variable "KUBE_CLUSTER_CA_CERT_DATA" {}
 
 
 terraform {
@@ -74,24 +76,6 @@ resource "vault_kv_secret_v2" "dev_db_secret" {
   })
 }
 
-# # Provider configuration for Kubernetes/OpenShift cluster access
-# provider "kubernetes" {
-#   # Option A: If running agent inside OpenShift Pod with ServiceAccount mounted
-#   # (Leaves config empty to auto-discover in-cluster service account)
-  
-#   # Option B: If running Podman-based agent on external VM using kubeconfig
-#   # config_path = "~/.kube/config"
-#   # Or explicitly define server and token:
-#   host        = "https://api.your-ocp-cluster.com:6443"
-#   token       = var.k8s_token
-#   insecure    = true
-# }
-
-
-variable "KUBE_HOST" {}
-variable "KUBE_TOKEN"" {}
-variable "KUBE_CLUSTER_CA_CERT_DATA" {}
-
 
 provider "kubernetes" {
   host = var.KUBE_HOST
@@ -111,4 +95,4 @@ resource "kubernetes_namespace" "app_dev" {
       managed-by  = "terraform"
     }
   }
-}# Comment
+}
