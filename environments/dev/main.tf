@@ -11,6 +11,11 @@ output "debug_db_username" {
   value = var.db_username
 }
 
+
+output "debug_db_username" {
+  value = var.db_password
+}
+
 # terraform {
 #   required_version = ">= 1.5.0"
 #   required_providers {
