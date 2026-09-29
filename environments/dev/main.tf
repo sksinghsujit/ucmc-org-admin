@@ -11,7 +11,7 @@ output "debug_db_username" {
 }
 
 
-output "debug_db_username" {
+output "debug_db_password" {
   value = var.db_password
 }
 
