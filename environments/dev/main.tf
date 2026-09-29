@@ -26,9 +26,7 @@ terraform {
   }
 }
 
-provider "vault" {
-  address = "http://vault1.ucmcswg.com:8200"
-}
+provider "vault" {}
 
 # Define mount path locally instead of invalid data source
 locals {
@@ -73,9 +71,29 @@ resource "vault_kv_secret_v2" "dev_db_secret" {
   })
 }
 
-# Comment
-# Comment
-# Comment
-# Comment
-# Comment
-# Comment
+# # Provider configuration for Kubernetes/OpenShift cluster access
+# provider "kubernetes" {
+#   # Option A: If running agent inside OpenShift Pod with ServiceAccount mounted
+#   # (Leaves config empty to auto-discover in-cluster service account)
+  
+#   # Option B: If running Podman-based agent on external VM using kubeconfig
+#   # config_path = "~/.kube/config"
+#   # Or explicitly define server and token:
+#   host        = "https://api.your-ocp-cluster.com:6443"
+#   token       = var.k8s_token
+#   insecure    = true
+# }
+
+provider "kubernetes" {}
+
+# Create Kubernetes Namespace
+resource "kubernetes_namespace" "app_dev" {
+  metadata {
+    name = "app-dev"
+
+    labels = {
+      environment = "dev"
+      managed-by  = "terraform"
+    }
+  }
+}
