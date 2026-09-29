@@ -10,10 +10,6 @@ variable "db_password" {
   sensitive   = true
 }
 
-output "dev_test" {
-  value = "Dev execution verified on agent"
-}
-
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
