@@ -83,8 +83,6 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(var.KUBE_CLUSTER_CA_CERT_DATA)
 }
 
-provider "kubernetes" {}
-
 # Create Kubernetes Namespace
 resource "kubernetes_namespace" "app_dev" {
   metadata {
