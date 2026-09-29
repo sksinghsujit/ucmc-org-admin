@@ -84,7 +84,7 @@ provider "kubernetes" {
   host = var.KUBE_HOST
   token = var.KUBE_TOKEN
   cluster_ca_certificate = var.KUBE_CLUSTER_CA_CERT_DATA
-  insecure = true
+  # insecure = true
 }
 
 # Create Kubernetes Namespace
