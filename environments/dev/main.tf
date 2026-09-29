@@ -4,15 +4,16 @@ variable "db_username" {
 
 variable "db_password" {
   type      = string
+  sensitive = true
 }
 
 output "debug_db_username" {
   value = var.db_username
 }
 
-
 output "debug_db_password" {
-  value = var.db_password
+  value     = var.db_password
+  sensitive = true
 }
 
 terraform {
@@ -29,12 +30,13 @@ provider "vault" {
   address = "http://vault1.ucmcswg.com:8200"
 }
 
-data "vault_auth_backend" "kubernetes" {
-  path = "kubernetes"
+# Define mount path locally instead of invalid data source
+locals {
+  kv_mount_path = "secret"
 }
 
-data "vault_mount" "kvv2" {
-  path = "secret"
+data "vault_auth_backend" "kubernetes" {
+  path = "kubernetes"
 }
 
 # Dev Policy
@@ -42,7 +44,7 @@ resource "vault_policy" "dev_policy" {
   name = "dev-app-policy"
 
   policy = <<EOT
-path "${data.vault_mount.kvv2.path}/data/dev/*" {
+path "${local.kv_mount_path}/data/dev/*" {
   capabilities = ["read", "list"]
 }
 EOT
@@ -58,9 +60,9 @@ resource "vault_kubernetes_auth_backend_role" "dev_role" {
   token_ttl                        = 3600
 }
 
-# Dev Secret in Vault (Populated via HCP Terraform Variables)
+# Dev Secret in Vault
 resource "vault_kv_secret_v2" "dev_db_secret" {
-  mount               = data.vault_mount.kvv2.path
+  mount               = local.kv_mount_path
   name                = "dev/database"
   cas                 = 1
   delete_all_versions = true
