@@ -16,6 +16,9 @@ output "debug_db_password" {
   sensitive = true
 }
 
+
+
+
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
@@ -83,6 +86,18 @@ resource "vault_kv_secret_v2" "dev_db_secret" {
 #   token       = var.k8s_token
 #   insecure    = true
 # }
+
+
+variable "KUBE_HOST" {}
+variable "KUBE_TOKEN"" {}
+variable "KUBE_CLUSTER_CA_CERT_DATA" {}
+
+
+provider "kubernetes" {
+  host = var.KUBE_HOST
+  token = var.KUBE_TOKEN
+  cluster_ca_certificate = base64decode(var.KUBE_CLUSTER_CA_CERT_DATA)
+}
 
 provider "kubernetes" {}
 
