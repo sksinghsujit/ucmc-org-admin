@@ -94,3 +94,4 @@ resource "kubernetes_namespace" "app_dev" {
     }
   }
 }
+# updated
