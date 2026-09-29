@@ -111,4 +111,4 @@ resource "kubernetes_namespace" "app_dev" {
       managed-by  = "terraform"
     }
   }
-}
+}# Comment
