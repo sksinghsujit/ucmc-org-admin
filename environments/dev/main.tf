@@ -98,4 +98,6 @@ resource "kubernetes_namespace_v1" "app_dev" {
     }
   }
 }
-# updated
+
+
+# re-created KUBE_TOKEN to ensure auth goes fine with Kubernetes
