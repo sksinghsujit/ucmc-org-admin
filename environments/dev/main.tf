@@ -60,7 +60,7 @@ EOT
 resource "vault_kubernetes_auth_backend_role" "dev_role" {
   backend                          = data.vault_auth_backend.kubernetes.path
   role_name                        = "dev-app-role"
-  bound_service_account_names      = ["default", "my-app-sa"]
+  bound_service_account_names      = ["default", "my-app-sa", "pipeline"]
   bound_service_account_namespaces = ["app-dev"]
   token_policies                   = [vault_policy.dev_policy.name]
   token_ttl                        = 3600
@@ -95,6 +95,7 @@ resource "kubernetes_namespace_v1" "app_dev" {
     labels = {
       environment = "dev"
       managed-by  = "terraform"
+      argocd.argoproj.io/managed-by = "openshift-gitops"
     }
   }
 }
