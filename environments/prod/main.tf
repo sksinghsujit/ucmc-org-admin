@@ -88,13 +88,6 @@ provider "kubernetes" {
 }
 
 
-resource "kubernetes_service_account_v1" "pipeline" {
-  metadata {
-    name      = "pipeline"
-    namespace = "app-prod"
-  }
-}
-
 
 # Create Kubernetes Namespace
 resource "kubernetes_namespace_v1" "app_prod" {
@@ -110,4 +103,13 @@ resource "kubernetes_namespace_v1" "app_prod" {
 }
 
 
-# more test
+resource "kubernetes_service_account_v1" "pipeline" {
+  metadata {
+    name      = "pipeline"
+    namespace = "app-prod"
+  }
+}
+
+
+
+# update sequence
