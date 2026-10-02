@@ -110,4 +110,4 @@ resource "kubernetes_namespace_v1" "app_prod" {
 }
 
 
-# one more update test
+# more test
