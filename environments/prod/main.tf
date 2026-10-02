@@ -136,7 +136,7 @@ resource "kubernetes_namespace_v1" "with_vault_app_prod" {
 }
 
 
-resource "kubernetes_service_account_v1" "pipeline" {
+resource "kubernetes_service_account_v1" "with_vault_pipeline" {
   metadata {
     name      = "pipeline"
     namespace = "with-vault-app-prod"
