@@ -66,6 +66,17 @@ resource "vault_kubernetes_auth_backend_role" "dev_role" {
   token_ttl                        = 3600
 }
 
+
+resource "vault_kubernetes_auth_backend_role" "with_vault_dev_role" {
+  backend                          = data.vault_auth_backend.kubernetes.path
+  role_name                        = "with-vault-dev-app-role"
+  bound_service_account_names      = ["default", "my-app-sa", "pipeline"]
+  bound_service_account_namespaces = ["with-vault-app-dev"]
+  token_policies                   = [vault_policy.dev_policy.name]
+  token_ttl                        = 3600
+}
+
+
 # Dev Secret in Vault
 resource "vault_kv_secret_v2" "dev_db_secret" {
   mount               = local.kv_mount_path

@@ -69,7 +69,7 @@ resource "vault_kubernetes_auth_backend_role" "prod_role" {
 
 resource "vault_kubernetes_auth_backend_role" "with_vault_prod_role" {
   backend                          = data.vault_auth_backend.kubernetes.path
-  role_name                        = "prod-app-role"
+  role_name                        = "with-vault-prod-app-role"
   bound_service_account_names      = ["default", "my-app-sa", "pipeline"]
   bound_service_account_namespaces = ["with-vault-app-prod"]
   token_policies                   = [vault_policy.prod_policy.name]
