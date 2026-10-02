@@ -88,7 +88,7 @@ provider "kubernetes" {
 }
 
 
-resource "kubernetes_service_account" "pipeline" {
+resource "kubernetes_service_account_v1" "pipeline" {
   metadata {
     name      = "pipeline"
     namespace = "app-prod"
@@ -110,4 +110,4 @@ resource "kubernetes_namespace_v1" "app_prod" {
 }
 
 
-# Check one more time
+# one more update test
