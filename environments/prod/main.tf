@@ -110,4 +110,4 @@ resource "kubernetes_namespace_v1" "app_prod" {
 }
 
 
-# re-created KUBE_TOKEN to ensure auth goes fine with Kubernetes
+# Creating the needed stuff
