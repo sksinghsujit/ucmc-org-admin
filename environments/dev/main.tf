@@ -101,4 +101,15 @@ resource "kubernetes_namespace_v1" "app_dev" {
 }
 
 
-# re-created KUBE_TOKEN to ensure auth goes fine with Kubernetes
+# Create Kubernetes Namespace
+resource "kubernetes_namespace_v1" "with-vault-app-dev" {
+  metadata {
+    name = "with-vault-app-dev"
+
+    labels = {
+      environment = "dev"
+      managed-by  = "terraform"
+      "argocd.argoproj.io/managed-by" = "openshift-gitops"
+    }
+  }
+}
