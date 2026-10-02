@@ -95,7 +95,7 @@ resource "kubernetes_namespace_v1" "app_dev" {
     labels = {
       environment = "dev"
       managed-by  = "terraform"
-      "argocd.argoproj.io/managed-by" = "openshift-gitops""
+      "argocd.argoproj.io/managed-by" = "openshift-gitops"
     }
   }
 }
