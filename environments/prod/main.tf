@@ -1,22 +1,3 @@
-variable "db_username" {
-  type = string
-}
-
-variable "db_password" {
-  type      = string
-  sensitive = true
-}
-
-output "debug_db_username" {
-  value = var.db_username
-}
-
-output "debug_db_password" {
-  value     = var.db_password
-  sensitive = true
-}
-
-
 variable "VAULT_ADDR" {}
 variable "VAULT_TOKEN" {}
 variable "KUBE_HOST" {}
@@ -75,20 +56,6 @@ resource "vault_kubernetes_auth_backend_role" "with_vault_prod_role" {
   token_policies                   = [vault_policy.prod_policy.name]
   token_ttl                        = 3600
 }
-
-# Dev Secret in Vault
-resource "vault_kv_secret_v2" "prod_db_secret" {
-  mount               = local.kv_mount_path
-  name                = "prod/database"
-  cas                 = 1
-  delete_all_versions = true
-
-  data_json = jsonencode({
-    username = var.db_username
-    password = var.db_password
-  })
-}
-
 
 provider "kubernetes" {
   host = var.KUBE_HOST
