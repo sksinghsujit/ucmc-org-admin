@@ -1,4 +1,3 @@
-
 variable "VAULT_ADDR" {}
 variable "VAULT_TOKEN" {}
 variable "KUBE_HOST" {}
@@ -91,3 +90,4 @@ resource "kubernetes_namespace_v1" "with-vault-app-dev" {
     }
   }
 }
+# Test an update
