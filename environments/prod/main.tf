@@ -368,4 +368,4 @@ YAML
 
   depends_on = [kubernetes_manifest.vault_connection]
 }
-# update to test
+# update to production namespace
