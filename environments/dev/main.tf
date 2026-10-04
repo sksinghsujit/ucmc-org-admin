@@ -5,7 +5,6 @@ variable "KUBE_TOKEN" {}
 variable "KUBE_CLUSTER_CA_CERT_DATA" {}
 variable "CUSTOM_CA_CRT" {}
 
-
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
@@ -20,7 +19,6 @@ terraform {
   }
 }
 
-
 provider "vault" {}
 
 # Define mount path locally instead of invalid data source
@@ -32,12 +30,10 @@ data "vault_auth_backend" "kubernetes" {
   path = "kubernetes"
 }
 
-
 # Vault stores the k8s_host and k8s_ca_cert in its auth config endpoint
 data "vault_generic_secret" "kubernetes_auth_config" {
   path = "auth/${data.vault_auth_backend.kubernetes.path}/config"
 }
-
 
 # 3. Configure the kubectl provider dynamically
 provider "kubectl" {
@@ -46,8 +42,6 @@ provider "kubectl" {
   token                  = var.KUBE_TOKEN
   load_config_file       = false
 }
-
-
 
 # Dev Policy
 resource "vault_policy" "dev_policy" {
@@ -100,7 +94,6 @@ resource "kubernetes_namespace_v1" "app_dev" {
   }
 }
 
-
 # Create Kubernetes Namespace
 resource "kubernetes_namespace_v1" "with-vault-app-dev" {
   metadata {
@@ -113,7 +106,6 @@ resource "kubernetes_namespace_v1" "with-vault-app-dev" {
     }
   }
 }
-
 
 resource "kubernetes_manifest" "app_dev_src_pvc" {
   manifest = {
