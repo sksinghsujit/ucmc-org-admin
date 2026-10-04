@@ -158,7 +158,7 @@ resource "kubernetes_cluster_role_binding_v1" "pipeline_image_builder_dev" {
 }
 
 
-resource "kubernetes_config_map" "custom-ca-bundle" {
+resource "kubernetes_config_map_v1" "custom-ca-bundle" {
   metadata {
     name      = "custom-ca-bundle"
     namespace = "with-vault-app-dev"
@@ -320,45 +320,38 @@ resource "kubernetes_manifest" "sonarqube_token_sync" {
 }
 
 # 5. GitHub SSH Key Secret (SSH Auth for Tekton)
-resource "kubernetes_manifest" "github_gitops_ssh_sync" {
-  computed_fields = [
-    "spec.refreshInterval",
-    "spec.transformation"
-  ]
-
-  manifest = {
-    apiVersion = "secrets.hashicorp.com/v1beta1"
-    kind       = "VaultStaticSecret"
-    metadata = {
-      name      = "github-gitops-ssh-sync"
-      namespace = var.namespace
-    }
-    spec = {
-      vaultAuthRef    = var.vault_auth_ref
-      mount           = "secret"
-      type            = "kv-v2"
-      path            = "dev/github"
-      refreshInterval = "1m"
-      transformation = {
-        includeKeys = ["ssh-privatekey"]
-      }
-      destination = {
-        name   = "github-gitops-ssh"
-        create = true
-        type   = "kubernetes.io/ssh-auth"
-        annotations = {
-          "tekton.dev/git-0" = "github.com"
-        }
-      }
-    }
-  }
+resource "kubectl_manifest" "github_gitops_ssh_sync" {
+  yaml_body = <<YAML
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: github-gitops-ssh-sync
+  namespace: ${var.namespace}
+spec:
+  vaultAuthRef: ${var.vault_auth_ref}
+  mount: "secret"
+  type: "kv-v2"
+  path: "dev/github"
+  refreshInterval: "1m"
+  transformation:
+    includeKeys:
+      - "ssh-privatekey"
+  destination:
+    name: "github-gitops-ssh"
+    create: true
+    type: "kubernetes.io/ssh-auth"
+    annotations:
+      tekton.dev/git-0: "github.com"
+YAML
 
   lifecycle {
     ignore_changes = [
-      manifest.spec.hmacSecretData,
-      manifest.spec.transformation,
+      yaml_body,
     ]
   }
+
+  depends_on = [kubernetes_manifest.vault_connection]
+}
 
   depends_on = [kubernetes_manifest.vault_connection]
 }
