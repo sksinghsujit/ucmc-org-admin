@@ -227,6 +227,33 @@ resource "kubernetes_manifest" "vault_connection" {
   }
 }
 
+# 1. Vault Authentication Configuration
+resource "kubectl_manifest" "vault_auth" {
+  yaml_body = <<YAML
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: ${var.vault_auth_ref}
+  namespace: ${var.namespace}
+spec:
+  method: "kubernetes"
+  mount: "kubernetes"
+  kubernetes:
+    role: "with-vault-app-dev" # Must match the Vault k8s auth role configured in Vault
+    serviceAccount: "default"   # ServiceAccount present in the namespace
+  vaultConnectionRef: "vault-connection"
+YAML
+
+  lifecycle {
+    ignore_changes = [
+      yaml_body,
+    ]
+  }
+
+  depends_on = [kubernetes_manifest.vault_connection]
+}
+
+
 # 2. Database Credentials Secret
 resource "kubectl_manifest" "postgres_vso_secret" {
   yaml_body = <<YAML
