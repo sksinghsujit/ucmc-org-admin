@@ -32,6 +32,19 @@ data "vault_auth_backend" "kubernetes" {
   path = "kubernetes"
 }
 
+
+# Vault stores the k8s_host and k8s_ca_cert in its auth config endpoint
+data "vault_generic_secret" "kubernetes_auth_config" {
+  path = "auth/${data.vault_auth_backend.kubernetes.path}/config"
+}
+
+
+# Vault stores the k8s_host and k8s_ca_cert in its auth config endpoint
+data "vault_generic_secret" "kubernetes_auth_config" {
+  path = "auth/${data.vault_auth_backend.kubernetes.path}/config"
+}
+
+
 # Dev Policy
 resource "vault_policy" "dev_policy" {
   name = "dev-app-policy"
