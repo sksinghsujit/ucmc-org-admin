@@ -39,10 +39,14 @@ data "vault_generic_secret" "kubernetes_auth_config" {
 }
 
 
-# Vault stores the k8s_host and k8s_ca_cert in its auth config endpoint
-data "vault_generic_secret" "kubernetes_auth_config" {
-  path = "auth/${data.vault_auth_backend.kubernetes.path}/config"
+# 3. Configure the kubectl provider dynamically
+provider "kubectl" {
+  host                   = data.vault_generic_secret.kubernetes_auth_config.data["kubernetes_host"]
+  cluster_ca_certificate = data.vault_generic_secret.kubernetes_auth_config.data["kubernetes_ca_cert"]
+  token                  = var.kubernetes_token # Or token fetched from Vault secret/SA
+  load_config_file       = false
 }
+
 
 
 # Dev Policy
