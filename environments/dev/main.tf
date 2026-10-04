@@ -138,7 +138,7 @@ resource "kubernetes_role_binding_v1" "scc_binding" {
 
   subject {
     kind      = "ServiceAccount"
-    name      = "system:serviceaccount:with-vault-app-dev:pipeline"
+    name      = "pipeline"
     namespace = "with-vault-app-dev"
   }
 }
