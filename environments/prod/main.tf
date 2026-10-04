@@ -234,7 +234,7 @@ spec:
   method: "kubernetes"
   mount: "kubernetes"
   kubernetes:
-    role: "with-vault-dev-app-role" 
+    role: "with-vault-prod-app-role" 
     serviceAccount: "default"
   vaultConnectionRef: "vault-connection"
 YAML
