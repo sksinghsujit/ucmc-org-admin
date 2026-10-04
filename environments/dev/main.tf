@@ -352,6 +352,3 @@ YAML
 
   depends_on = [kubernetes_manifest.vault_connection]
 }
-
-  depends_on = [kubernetes_manifest.vault_connection]
-}
