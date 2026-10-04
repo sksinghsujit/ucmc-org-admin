@@ -121,7 +121,7 @@ resource "kubernetes_manifest" "app_dev_src_pvc" {
 resource "kubernetes_role_binding" "scc_binding" {
   metadata {
     name      = "allow-anyuid-scc"
-    namespace = kubernetes_namespace_v1.with-vault-app-dev.name
+    namespace = "with-vault-app-dev"
   }
 
   role_ref {
@@ -133,7 +133,7 @@ resource "kubernetes_role_binding" "scc_binding" {
   subject {
     kind      = "ServiceAccount"
     name      = "system:serviceaccount:with-vault-app-dev:pipeline"
-    namespace = kubernetes_namespace_v1.with-vault-app-dev.name
+    namespace = "with-vault-app-dev"
   }
 }
 
@@ -152,7 +152,7 @@ resource "kubernetes_cluster_role_binding" "pipeline_image_builder_dev" {
   subject {
     kind      = "ServiceAccount"
     name      = "system:serviceaccount:with-vault-app-dev:pipeline"
-    namespace = kubernetes_namespace_v1.with-vault-app-dev.name
+    namespace = "with-vault-app-dev"
   }
 }
 
@@ -160,7 +160,7 @@ resource "kubernetes_cluster_role_binding" "pipeline_image_builder_dev" {
 resource "kubernetes_config_map" "custom-ca-bundle" {
   metadata {
     name      = "custom-ca-bundle"
-    namespace = kubernetes_namespace_v1.with-vault-app-dev.name
+    namespace = "with-vault-app-dev"
   }
 
   data = {
