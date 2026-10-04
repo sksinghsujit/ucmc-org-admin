@@ -13,17 +13,13 @@ terraform {
       source  = "hashicorp/vault"
       version = "~> 4.0"
     }
-  }
-}
-
-terraform {
-  required_providers {
     kubectl = {
       source  = "gavinbunney/kubectl"
       version = ">= 1.14.0"
     }
   }
 }
+
 
 provider "vault" {}
 
