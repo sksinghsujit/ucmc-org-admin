@@ -211,36 +211,27 @@ resource "kubernetes_manifest" "vault_connection" {
 }
 
 # 2. Database Credentials Secret
-resource "kubernetes_manifest" "postgres_vso_secret" {
-  computed_fields = [
-    "spec.refreshInterval",
-    "spec.transformation"
-  ]
-
-  manifest = {
-    apiVersion = "secrets.hashicorp.com/v1beta1"
-    kind       = "VaultStaticSecret"
-    metadata = {
-      name      = "postgres-vso-secret"
-      namespace = var.namespace
-    }
-    spec = {
-      vaultAuthRef    = var.vault_auth_ref
-      mount           = "secret"
-      type            = "kv-v2"
-      path            = "dev/database"
-      refreshInterval = "1m"
-      destination = {
-        name   = "postgres-secret"
-        create = true
-      }
-    }
-  }
+resource "kubectl_manifest" "postgres_vso_secret" {
+  yaml_body = <<YAML
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: postgres-vso-secret
+  namespace: ${var.namespace}
+spec:
+  vaultAuthRef: ${var.vault_auth_ref}
+  mount: "secret"
+  type: "kv-v2"
+  path: "dev/database"
+  refreshInterval: "1m"
+  destination:
+    name: "postgres-secret"
+    create: true
+YAML
 
   lifecycle {
     ignore_changes = [
-      manifest.spec.hmacSecretData,
-      manifest.spec.transformation,
+      yaml_body,
     ]
   }
 
@@ -248,39 +239,30 @@ resource "kubernetes_manifest" "postgres_vso_secret" {
 }
 
 # 3. GitHub PAT Secret (HTTP Auth)
-resource "kubernetes_manifest" "github_gitops_token_sync" {
-  computed_fields = [
-    "spec.refreshInterval",
-    "spec.transformation"
-  ]
-
-  manifest = {
-    apiVersion = "secrets.hashicorp.com/v1beta1"
-    kind       = "VaultStaticSecret"
-    metadata = {
-      name      = "github-gitops-token-sync"
-      namespace = var.namespace
-    }
-    spec = {
-      vaultAuthRef    = var.vault_auth_ref
-      mount           = "secret"
-      type            = "kv-v2"
-      path            = "dev/github"
-      refreshInterval = "1m"
-      transformation = {
-        includeKeys = ["password"]
-      }
-      destination = {
-        name   = "github-gitops-token"
-        create = true
-      }
-    }
-  }
+resource "kubectl_manifest" "github_gitops_token_sync" {
+  yaml_body = <<YAML
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: github-gitops-token-sync
+  namespace: ${var.namespace}
+spec:
+  vaultAuthRef: ${var.vault_auth_ref}
+  mount: "secret"
+  type: "kv-v2"
+  path: "dev/github"
+  refreshInterval: "1m"
+  transformation:
+    includeKeys:
+      - "password"
+  destination:
+    name: "github-gitops-token"
+    create: true
+YAML
 
   lifecycle {
     ignore_changes = [
-      manifest.spec.hmacSecretData,
-      manifest.spec.transformation,
+      yaml_body,
     ]
   }
 
@@ -288,42 +270,32 @@ resource "kubernetes_manifest" "github_gitops_token_sync" {
 }
 
 # 4. SonarQube Token Secret
-resource "kubernetes_manifest" "sonarqube_token_sync" {
-  computed_fields = [
-    "spec.refreshInterval",
-    "spec.transformation"
-  ]
-
-  manifest = {
-    apiVersion = "secrets.hashicorp.com/v1beta1"
-    kind       = "VaultStaticSecret"
-    metadata = {
-      name      = "sonarqube-token-sync"
-      namespace = var.namespace
-    }
-    spec = {
-      vaultAuthRef    = var.vault_auth_ref
-      mount           = "secret"
-      type            = "kv-v2"
-      path            = "dev/sonarqube"
-      refreshInterval = "1m"
-      destination = {
-        name   = "sonarqube-token"
-        create = true
-      }
-    }
-  }
+resource "kubectl_manifest" "sonarqube_token_sync" {
+  yaml_body = <<YAML
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultStaticSecret
+metadata:
+  name: sonarqube-token-sync
+  namespace: ${var.namespace}
+spec:
+  vaultAuthRef: ${var.vault_auth_ref}
+  mount: "secret"
+  type: "kv-v2"
+  path: "dev/sonarqube"
+  refreshInterval: "1m"
+  destination:
+    name: "sonarqube-token"
+    create: true
+YAML
 
   lifecycle {
     ignore_changes = [
-      manifest.spec.hmacSecretData,
-      manifest.spec.transformation,
+      yaml_body,
     ]
   }
 
   depends_on = [kubernetes_manifest.vault_connection]
 }
-
 # 5. GitHub SSH Key Secret (SSH Auth for Tekton)
 resource "kubectl_manifest" "github_gitops_ssh_sync" {
   yaml_body = <<YAML
