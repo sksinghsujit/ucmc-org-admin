@@ -190,6 +190,26 @@ variable "namespace" {
   default     = "with-vault-app-dev"
 }
 
+
+# Allow the prod namespace default sa to act as auth-delegator
+resource "kubectl_manifest" "dev-auth-delegator" {
+  yaml_body = <<YAML
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: with-vault-app-dev-auth-delegator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: with-vault-app-dev
+YAML
+}
+
+
 variable "vault_address" {
   type        = string
   description = "Vault cluster address"
