@@ -239,8 +239,8 @@ spec:
   method: "kubernetes"
   mount: "kubernetes"
   kubernetes:
-    role: "with-vault-app-dev" # Must match the Vault k8s auth role configured in Vault
-    serviceAccount: "default"   # ServiceAccount present in the namespace
+    role: "with-vault-dev-app-role" 
+    serviceAccount: "default"
   vaultConnectionRef: "vault-connection"
 YAML
 
