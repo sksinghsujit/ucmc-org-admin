@@ -3,6 +3,7 @@ variable "VAULT_TOKEN" {}
 variable "KUBE_HOST" {}
 variable "KUBE_TOKEN" {}
 variable "KUBE_CLUSTER_CA_CERT_DATA" {}
+variable "CUSTOM_CA_CRT" {}
 
 
 terraform {
@@ -118,7 +119,7 @@ resource "kubernetes_manifest" "app_dev_src_pvc" {
 }
 
 
-resource "kubernetes_role_binding" "scc_binding" {
+resource "kubernetes_role_binding_v1" "scc_binding" {
   metadata {
     name      = "allow-anyuid-scc"
     namespace = "with-vault-app-dev"
