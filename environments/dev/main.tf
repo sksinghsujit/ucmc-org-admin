@@ -139,7 +139,7 @@ resource "kubernetes_role_binding_v1" "scc_binding" {
 }
 
 
-resource "kubernetes_cluster_role_binding" "pipeline_image_builder_dev" {
+resource "kubernetes_cluster_role_binding_v1" "pipeline_image_builder_dev" {
   metadata {
     name = "my-openshift-cluster-role-binding"
   }
@@ -207,6 +207,11 @@ resource "kubernetes_manifest" "vault_connection" {
 
 # 2. Database Credentials Secret
 resource "kubernetes_manifest" "postgres_vso_secret" {
+  computed_fields = [
+    "spec.refreshInterval",
+    "spec.transformation"
+  ]
+
   manifest = {
     apiVersion = "secrets.hashicorp.com/v1beta1"
     kind       = "VaultStaticSecret"
@@ -220,17 +225,18 @@ resource "kubernetes_manifest" "postgres_vso_secret" {
       type            = "kv-v2"
       path            = "dev/database"
       refreshInterval = "1m"
-      transformation  = {}
       destination = {
         name   = "postgres-secret"
         create = true
       }
     }
   }
+
   lifecycle {
-  ignore_changes = [
-    manifest.spec.hmacSecretData,
-  ]
+    ignore_changes = [
+      manifest.spec.hmacSecretData,
+      manifest.spec.transformation,
+    ]
   }
 
   depends_on = [kubernetes_manifest.vault_connection]
@@ -238,6 +244,11 @@ resource "kubernetes_manifest" "postgres_vso_secret" {
 
 # 3. GitHub PAT Secret (HTTP Auth)
 resource "kubernetes_manifest" "github_gitops_token_sync" {
+  computed_fields = [
+    "spec.refreshInterval",
+    "spec.transformation"
+  ]
+
   manifest = {
     apiVersion = "secrets.hashicorp.com/v1beta1"
     kind       = "VaultStaticSecret"
@@ -260,10 +271,12 @@ resource "kubernetes_manifest" "github_gitops_token_sync" {
       }
     }
   }
-    lifecycle {
-  ignore_changes = [
-    manifest.spec.hmacSecretData,
-  ]
+
+  lifecycle {
+    ignore_changes = [
+      manifest.spec.hmacSecretData,
+      manifest.spec.transformation,
+    ]
   }
 
   depends_on = [kubernetes_manifest.vault_connection]
@@ -271,6 +284,11 @@ resource "kubernetes_manifest" "github_gitops_token_sync" {
 
 # 4. SonarQube Token Secret
 resource "kubernetes_manifest" "sonarqube_token_sync" {
+  computed_fields = [
+    "spec.refreshInterval",
+    "spec.transformation"
+  ]
+
   manifest = {
     apiVersion = "secrets.hashicorp.com/v1beta1"
     kind       = "VaultStaticSecret"
@@ -284,17 +302,18 @@ resource "kubernetes_manifest" "sonarqube_token_sync" {
       type            = "kv-v2"
       path            = "dev/sonarqube"
       refreshInterval = "1m"
-      transformation  = {}
       destination = {
         name   = "sonarqube-token"
         create = true
       }
     }
   }
-    lifecycle {
-  ignore_changes = [
-    manifest.spec.hmacSecretData,
-  ]
+
+  lifecycle {
+    ignore_changes = [
+      manifest.spec.hmacSecretData,
+      manifest.spec.transformation,
+    ]
   }
 
   depends_on = [kubernetes_manifest.vault_connection]
@@ -302,6 +321,11 @@ resource "kubernetes_manifest" "sonarqube_token_sync" {
 
 # 5. GitHub SSH Key Secret (SSH Auth for Tekton)
 resource "kubernetes_manifest" "github_gitops_ssh_sync" {
+  computed_fields = [
+    "spec.refreshInterval",
+    "spec.transformation"
+  ]
+
   manifest = {
     apiVersion = "secrets.hashicorp.com/v1beta1"
     kind       = "VaultStaticSecret"
@@ -328,14 +352,13 @@ resource "kubernetes_manifest" "github_gitops_ssh_sync" {
       }
     }
   }
-    lifecycle {
-  ignore_changes = [
-    manifest.spec.hmacSecretData,
-  ]
+
+  lifecycle {
+    ignore_changes = [
+      manifest.spec.hmacSecretData,
+      manifest.spec.transformation,
+    ]
   }
 
   depends_on = [kubernetes_manifest.vault_connection]
 }
-
-
-
