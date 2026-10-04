@@ -141,7 +141,7 @@ resource "kubernetes_manifest" "app_dev_src_pvc" {
 
 resource "kubernetes_role_binding_v1" "scc_binding" {
   metadata {
-    name      = "allow-anyuid-scc"
+    name      = "allow-anyuid-scc-prod"
     namespace = "with-vault-app-prod"
   }
 
@@ -261,7 +261,7 @@ spec:
   vaultAuthRef: ${var.vault_auth_ref}
   mount: "secret"
   type: "kv-v2"
-  path: "dev/database"
+  path: "prod/database"
   refreshInterval: "1m"
   destination:
     name: "postgres-secret"
@@ -289,7 +289,7 @@ spec:
   vaultAuthRef: ${var.vault_auth_ref}
   mount: "secret"
   type: "kv-v2"
-  path: "dev/github"
+  path: "prod/github"
   refreshInterval: "1m"
   transformation:
     includeKeys:
@@ -320,7 +320,7 @@ spec:
   vaultAuthRef: ${var.vault_auth_ref}
   mount: "secret"
   type: "kv-v2"
-  path: "dev/sonarqube"
+  path: "prod/sonarqube"
   refreshInterval: "1m"
   destination:
     name: "sonarqube-token"
@@ -347,7 +347,7 @@ spec:
   vaultAuthRef: ${var.vault_auth_ref}
   mount: "secret"
   type: "kv-v2"
-  path: "dev/github"
+  path: "prod/github"
   refreshInterval: "1m"
   transformation:
     includeKeys:
