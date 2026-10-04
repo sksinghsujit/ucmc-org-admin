@@ -41,9 +41,9 @@ data "vault_generic_secret" "kubernetes_auth_config" {
 
 # 3. Configure the kubectl provider dynamically
 provider "kubectl" {
-  host                   = data.vault_generic_secret.kubernetes_auth_config.data["kubernetes_host"]
-  cluster_ca_certificate = data.vault_generic_secret.kubernetes_auth_config.data["kubernetes_ca_cert"]
-  token                  = var.kubernetes_token # Or token fetched from Vault secret/SA
+  host                   = var.KUBE_HOST
+  cluster_ca_certificate = var.KUBE_CLUSTER_CA_CERT_DATA
+  token                  = var.KUBE_TOKEN
   load_config_file       = false
 }
 
