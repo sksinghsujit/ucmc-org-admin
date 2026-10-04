@@ -190,7 +190,7 @@ resource "kubernetes_config_map_v1" "custom-ca-bundle" {
 
 
 # Allow the prod namespace default sa to act as auth-delegator
-resource "kubectl_manifest" "vault_auth" {
+resource "kubectl_manifest" "prod-auth-delegator" {
   yaml_body = <<YAML
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
