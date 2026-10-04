@@ -188,6 +188,25 @@ resource "kubernetes_config_map_v1" "custom-ca-bundle" {
   }
 }
 
+
+# Allow the prod namespace default sa to act as auth-delegator
+resource "kubectl_manifest" "vault_auth" {
+  yaml_body = <<YAML
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: with-vault-app-prod-auth-delegator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: with-vault-app-prod
+YAML
+}
+
 variable "namespace" {
   type        = string
   description = "Target OpenShift / Kubernetes namespace"
