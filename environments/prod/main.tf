@@ -161,7 +161,7 @@ resource "kubernetes_role_binding_v1" "scc_binding" {
 
 resource "kubernetes_cluster_role_binding_v1" "pipeline_image_builder_prod" {
   metadata {
-    name = "my-openshift-cluster-role-binding"
+    name = "pipeline-clusterrolebinding-prod"
   }
 
   role_ref {
@@ -369,3 +369,4 @@ YAML
   depends_on = [kubernetes_manifest.vault_connection]
 }
 # update to production namespace
+# update
