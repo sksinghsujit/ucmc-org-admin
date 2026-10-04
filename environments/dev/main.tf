@@ -157,7 +157,7 @@ resource "kubernetes_cluster_role_binding_v1" "pipeline_image_builder_dev" {
 
   subject {
     kind      = "ServiceAccount"
-    name      = "system:serviceaccount:with-vault-app-dev:pipeline"
+    name      = "pipeline"
     namespace = "with-vault-app-dev"
   }
 }
