@@ -90,4 +90,251 @@ resource "kubernetes_namespace_v1" "with-vault-app-dev" {
     }
   }
 }
-# Test an update
+
+
+resource "kubernetes_manifest" "app_dev_src_pvc" {
+  manifest = {
+    apiVersion = "v1"
+    kind       = "PersistentVolumeClaim"
+    metadata = {
+      name      = "app-dev-src-pvc"
+      namespace = var.namespace
+      labels = {
+        "app.kubernetes.io/managed-by" = "terraform"
+      }
+    }
+    spec = {
+      accessModes = [
+        "ReadWriteMany" # RWX
+      ]
+      storageClassName = "ocs-storagecluster-cephfs"
+      resources = {
+        requests = {
+          storage = "10Gi"
+        }
+      }
+    }
+  }
+}
+
+
+resource "kubernetes_role_binding" "scc_binding" {
+  metadata {
+    name      = "allow-anyuid-scc"
+    namespace = kubernetes_namespace_v1.with-vault-app-dev.name
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "system:openshift:scc:privileged" 
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = "system:serviceaccount:with-vault-app-dev:pipeline"
+    namespace = kubernetes_namespace_v1.with-vault-app-dev.name
+  }
+}
+
+
+resource "kubernetes_cluster_role_binding" "pipeline_image_builder_dev" {
+  metadata {
+    name = "my-openshift-cluster-role-binding"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "system:image-builder" 
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = "system:serviceaccount:with-vault-app-dev:pipeline"
+    namespace = kubernetes_namespace_v1.with-vault-app-dev.name
+  }
+}
+
+
+resource "kubernetes_config_map" "custom-ca-bundle" {
+  metadata {
+    name      = "custom-ca-bundle"
+    namespace = kubernetes_namespace_v1.with-vault-app-dev.name
+  }
+
+  data = {
+    "custom-ca.crt" = var.CUSTOM_CA_CRT
+  }
+}
+
+
+variable "namespace" {
+  type        = string
+  description = "Target OpenShift / Kubernetes namespace"
+  default     = "with-vault-app-dev"
+}
+
+variable "vault_address" {
+  type        = string
+  description = "Vault cluster address"
+  default     = "http://vault1.ucmcswg.com:8200"
+}
+
+variable "vault_auth_ref" {
+  type        = string
+  description = "Name of the VaultAuth CR in the cluster"
+  default     = "vault-auth"
+}
+
+
+# 1. VaultConnection Custom Resource
+resource "kubernetes_manifest" "vault_connection" {
+  manifest = {
+    apiVersion = "secrets.hashicorp.com/v1beta1"
+    kind       = "VaultConnection"
+    metadata = {
+      name      = "vault-connection"
+      namespace = var.namespace
+    }
+    spec = {
+      address       = var.vault_address
+      skipTLSVerify = true
+    }
+  }
+}
+
+# 2. Database Credentials Secret
+resource "kubernetes_manifest" "postgres_vso_secret" {
+  manifest = {
+    apiVersion = "secrets.hashicorp.com/v1beta1"
+    kind       = "VaultStaticSecret"
+    metadata = {
+      name      = "postgres-vso-secret"
+      namespace = var.namespace
+    }
+    spec = {
+      vaultAuthRef    = var.vault_auth_ref
+      mount           = "secret"
+      type            = "kv-v2"
+      path            = "dev/database"
+      refreshInterval = "1m"
+      transformation  = {}
+      destination = {
+        name   = "postgres-secret"
+        create = true
+      }
+    }
+  }
+  lifecycle {
+  ignore_changes = [
+    manifest.spec.hmacSecretData,
+  ]
+  }
+
+  depends_on = [kubernetes_manifest.vault_connection]
+}
+
+# 3. GitHub PAT Secret (HTTP Auth)
+resource "kubernetes_manifest" "github_gitops_token_sync" {
+  manifest = {
+    apiVersion = "secrets.hashicorp.com/v1beta1"
+    kind       = "VaultStaticSecret"
+    metadata = {
+      name      = "github-gitops-token-sync"
+      namespace = var.namespace
+    }
+    spec = {
+      vaultAuthRef    = var.vault_auth_ref
+      mount           = "secret"
+      type            = "kv-v2"
+      path            = "dev/github"
+      refreshInterval = "1m"
+      transformation = {
+        includeKeys = ["password"]
+      }
+      destination = {
+        name   = "github-gitops-token"
+        create = true
+      }
+    }
+  }
+    lifecycle {
+  ignore_changes = [
+    manifest.spec.hmacSecretData,
+  ]
+  }
+
+  depends_on = [kubernetes_manifest.vault_connection]
+}
+
+# 4. SonarQube Token Secret
+resource "kubernetes_manifest" "sonarqube_token_sync" {
+  manifest = {
+    apiVersion = "secrets.hashicorp.com/v1beta1"
+    kind       = "VaultStaticSecret"
+    metadata = {
+      name      = "sonarqube-token-sync"
+      namespace = var.namespace
+    }
+    spec = {
+      vaultAuthRef    = var.vault_auth_ref
+      mount           = "secret"
+      type            = "kv-v2"
+      path            = "dev/sonarqube"
+      refreshInterval = "1m"
+      transformation  = {}
+      destination = {
+        name   = "sonarqube-token"
+        create = true
+      }
+    }
+  }
+    lifecycle {
+  ignore_changes = [
+    manifest.spec.hmacSecretData,
+  ]
+  }
+
+  depends_on = [kubernetes_manifest.vault_connection]
+}
+
+# 5. GitHub SSH Key Secret (SSH Auth for Tekton)
+resource "kubernetes_manifest" "github_gitops_ssh_sync" {
+  manifest = {
+    apiVersion = "secrets.hashicorp.com/v1beta1"
+    kind       = "VaultStaticSecret"
+    metadata = {
+      name      = "github-gitops-ssh-sync"
+      namespace = var.namespace
+    }
+    spec = {
+      vaultAuthRef    = var.vault_auth_ref
+      mount           = "secret"
+      type            = "kv-v2"
+      path            = "dev/github"
+      refreshInterval = "1m"
+      transformation = {
+        includeKeys = ["ssh-privatekey"]
+      }
+      destination = {
+        name   = "github-gitops-ssh"
+        create = true
+        type   = "kubernetes.io/ssh-auth"
+        annotations = {
+          "tekton.dev/git-0" = "github.com"
+        }
+      }
+    }
+  }
+    lifecycle {
+  ignore_changes = [
+    manifest.spec.hmacSecretData,
+  ]
+  }
+
+  depends_on = [kubernetes_manifest.vault_connection]
+}
+
+
+
